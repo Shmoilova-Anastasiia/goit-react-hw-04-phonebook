@@ -17,24 +17,21 @@ const notifyOptions = {
   theme: 'colored',
 };
 
+const initialState = [
+  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' }];
+
 export const App = () => {
-  const [contacts, setContacts] = useState([
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },]);
+  const [contacts, setContacts] = useState(() => 
+    JSON.parse(localStorage.getItem('contacts')) ?? initialState
+  );
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    const contactsLS = localStorage.getItem('contacts');
-    const parsContants = JSON.parse(contactsLS);
-
-    if (!parsContants) { setContacts( parsContants) };
-     return
-  }, []);
 
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts))
+    localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
  
   const addContact =({ name, number })  => {
@@ -45,18 +42,19 @@ export const App = () => {
     )
     if (findName) {
       toast.error(`${name}: is already in contacts`, notifyOptions)
+      return
     }
     const findNumber = contacts.find(contact => contact.number === number);
     if (findNumber) {
       toast.error(`This phone number is already in use.`, notifyOptions)
+      return
     }
     const newContact = {
       id: nanoid(),
       name,
       number,
     };
-       setContacts(contacts => [newContact, ...contacts],
-        );
+    setContacts(contacts => [...contacts, newContact]);
   };
   
   const deleteContact = contactId => {
@@ -68,7 +66,7 @@ export const App = () => {
   };
 
   const changeFilter = e => {
-    setFilter(e.currentTarget.value.toLowerCase());
+    setFilter(e.currentTarget.value);
   };
 
   const getVisibleContacts = () => {
@@ -77,13 +75,13 @@ export const App = () => {
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
-
-  const visibleContacts = getVisibleContacts();
+const visibleContacts = getVisibleContacts();
+  
   return (
     <Container>
       <Section title="Phonebook">
         <TitleH1>Phonebook</TitleH1>
-        <ContactForm onAddContact={addContact} />
+        <ContactForm onAddContact={addContact}/>
         <TitleH2>Contacts</TitleH2>
         <Filter value={filter} onChange={changeFilter} />
         <ContactList

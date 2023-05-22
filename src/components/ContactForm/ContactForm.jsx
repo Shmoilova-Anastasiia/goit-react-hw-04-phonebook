@@ -1,7 +1,6 @@
 import React from 'react';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { nanoid } from 'nanoid';
 import PropTypes from 'prop-types';
 
 import {
@@ -41,7 +40,7 @@ export const ContactForm = ({ onAddContact }) => {
       }}
       onSubmit={(values, { resetForm }) => {
         
-        onAddContact({ id: nanoid(), ...values });
+        onAddContact({ ...values });
         
         resetForm();
       }}
